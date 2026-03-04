@@ -1,0 +1,4 @@
+project_id = "ffovfzlyqyqafavujdjm"
+
+[functions.classify-news]
+verify_jwt = false
