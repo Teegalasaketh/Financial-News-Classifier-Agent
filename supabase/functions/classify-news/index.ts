@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.208.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -55,19 +55,24 @@ serve(async (req) => {
             },
           },
         ],
-        tool_choice: { type: "function", function: { name: "classify_news" } },
+        tool_choice: "required",
       }),
     });
 
     if (!response.ok) {
+      const errText = await response.text();
+      console.error("Groq API error:", response.status, errText);
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const t = await response.text();
-      console.error("Groq API error:", response.status, t);
-      throw new Error("AI classification failed");
+      if (response.status === 401) {
+        return new Response(JSON.stringify({ error: "Invalid GROQ_API_KEY. Check your Supabase secret configuration." }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      throw new Error(`Groq API returned ${response.status}: ${errText}`);
     }
 
     const data = await response.json();
