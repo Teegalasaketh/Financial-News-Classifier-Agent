@@ -1,36 +1,38 @@
 # 📊 Financial News Classifier Agent
 
-A modern web-based application that analyzes financial news articles, classifies them, and provides insights such as sentiment, sector impact, and trading signals.
+A modern web-based application that analyzes financial news articles using **Groq-powered AI**, classifies them, and generates insights like sentiment, sector impact, and trading signals.
 
-Built using **React + TypeScript + Vite**, with a clean UI powered by **Tailwind CSS** and **shadcn/ui components**.
+Built with **React + TypeScript + Vite**, and powered by **Groq LLM API** for fast inference.
 
 ---
 
 ## 🚀 Features
 
-* 📰 **News Analysis**
+* 📰 **News Analysis (AI-Powered)**
 
   * Input financial news text
-  * Automatic classification and processing
+  * Processed using Groq LLMs for intelligent classification
 
 * 😊 **Sentiment Analysis**
 
-  * Detects positive, negative, or neutral sentiment
-  * Visualized using charts
+  * Positive / Negative / Neutral detection
+  * AI-driven interpretation of tone
 
 * 🏭 **Sector Classification**
 
-  * Identifies affected market sectors
-  * Displays sector-wise heatmaps
+  * Identifies impacted industries (e.g., Tech, Banking, Energy)
 
 * 📈 **Trading Signals**
 
-  * Generates actionable insights based on news sentiment
+  * Generates insights like Buy / Sell / Hold based on sentiment
 
-* 📊 **Data Visualization**
+* ⚡ **Ultra-fast Inference**
 
-  * Interactive charts (Recharts)
-  * Stats dashboard and summaries
+  * Powered by **Groq API** for low-latency responses
+
+* 📊 **Visualization**
+
+  * Charts and dashboards using Recharts
 
 ---
 
@@ -38,10 +40,10 @@ Built using **React + TypeScript + Vite**, with a clean UI powered by **Tailwind
 
 * **Frontend:** React 18 + TypeScript
 * **Build Tool:** Vite
-* **UI Framework:** Tailwind CSS + shadcn/ui
-* **State/Data Handling:** React Query
+* **UI:** Tailwind CSS + shadcn/ui
 * **Charts:** Recharts
-* **Backend Integration (optional):** Supabase
+* **API / AI Engine:** Groq LLM API
+* **Optional Backend:** Supabase / Serverless Functions
 
 ---
 
@@ -50,32 +52,30 @@ Built using **React + TypeScript + Vite**, with a clean UI powered by **Tailwind
 ```
 Financial-News-Classifier-Agent/
 │
-├── public/                # Static assets
+├── public/
 ├── src/
-│   ├── components/        # UI & feature components
+│   ├── components/
 │   │   ├── NewsAnalyzer.tsx
-│   │   ├── NewsCard.tsx
 │   │   ├── SentimentChart.tsx
 │   │   ├── SectorHeatmap.tsx
 │   │   ├── TradingSignals.tsx
-│   │   └── ui/            # Reusable UI components
+│   │   └── ui/
 │   │
-│   ├── App.tsx            # Main app entry
-│   └── App.css            # Styles
+│   ├── App.tsx
+│   └── App.css
 │
 ├── index.html
 ├── package.json
-└── vite.config (implicit)
 ```
 
 ---
 
-## ⚙️ Installation & Setup
+## ⚙️ Setup & Installation
 
-### 1. Clone the repository
+### 1. Clone repo
 
 ```bash
-git clone <your-repo-url>
+git clone <repo-url>
 cd Financial-News-Classifier-Agent
 ```
 
@@ -85,13 +85,27 @@ cd Financial-News-Classifier-Agent
 npm install
 ```
 
-### 3. Run development server
+---
+
+## 🔑 Groq API Setup
+
+1. Go to Groq and create an account
+2. Generate an API key
+3. Create a `.env` file in the root:
+
+```
+VITE_GROQ_API_KEY=your_api_key_here
+```
+
+---
+
+## ▶️ Run the App
 
 ```bash
 npm run dev
 ```
 
-App will run at:
+Open:
 
 ```
 http://localhost:5173
@@ -99,15 +113,20 @@ http://localhost:5173
 
 ---
 
-## 🧪 Testing
+## 🧠 How It Works
 
-```bash
-npm run test
-```
+1. User inputs financial news text
+2. The app sends the text to **Groq LLM API**
+3. AI processes:
+
+   * Sentiment
+   * Sector classification
+   * Trading signal
+4. Results are displayed via charts and UI components
 
 ---
 
-## 📦 Build for Production
+## 📦 Build
 
 ```bash
 npm run build
@@ -116,41 +135,28 @@ npm run preview
 
 ---
 
-## 🔐 Environment Variables
+## 🔮 Future Improvements
 
-Create a `.env` file if using Supabase or APIs:
-
-```
-VITE_SUPABASE_URL=your_url
-VITE_SUPABASE_ANON_KEY=your_key
-```
-
----
-
-## 💡 Future Improvements
-
-* 🔍 Real-time news API integration
-* 🤖 Advanced ML/NLP models for classification
-* 📱 Mobile responsiveness improvements
-* 🧠 AI-based trading recommendations
-* 🌐 Multi-language support
+* 🔍 Live financial news API integration
+* 🤖 Fine-tuned financial ML models
+* 📊 Portfolio impact analysis
+* 📱 Mobile optimization
+* 🧠 Multi-agent AI reasoning
 
 ---
 
 ## 📄 License
 
-This project is for educational and development purposes.
+For educational and experimental use.
 
 ---
 
 ## 👨‍💻 Author
 
-Developed as part of a financial analytics and AI-based classification project.
+AI + Finance project using Groq inference engine.
 
 ---
 
 ## ⭐ Contributing
 
-Feel free to fork, improve, and submit pull requests!
-
----
+Pull requests are welcome!
