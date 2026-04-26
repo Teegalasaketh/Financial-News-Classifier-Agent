@@ -1,541 +1,527 @@
-# README.md — Financial News Classifier Agent
+# Financial News Classifier Agent — AI-Powered Financial News Intelligence Platform
 
-# 📈 Financial News Classifier Agent
+<div align="center">
 
-## Abstract
-Financial analysts, traders, and portfolio managers struggle to process breaking economic news across thousands of sources in real time, often failing to separate market-moving events from noise due to sensational headlines, delayed reporting, and information overload.
+![Financial News Classifier Agent Banner](https://img.shields.io/badge/Financial News Classifier Agent-Market%20Intelligence-00ff64?style=for-the-badge&logo=activity&logoColor=white)
 
-Traditional news aggregators provide limited actionable intelligence, lacking:
-- Market impact prediction
-- Sector and asset effect mapping
-- Real-time trading signals
-- Event causality analysis
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5+-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Auth%20%2B%20DB-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
+[![Groq](https://img.shields.io/badge/Groq-AI%20Inference-F55036?style=flat-square)](https://groq.com/)
 
-This project proposes an AI-powered Financial News Classifier Agent that ingests real-time financial news streams, classifies market sentiment, predicts affected sectors and assets, generates trading signals, and measures prediction accuracy using actual market outcomes.
+**A real-time, multi-user financial news classification and trading intelligence platform powered by Groq AI, Finnhub, FastAPI, and Supabase.**
 
-The system combines:
-- Real-time news ingestion
-- Large Language Models (Groq API)
-- Causal NLP analysis
-- Historical market correlation engine
-- Reinforcement learning from outcomes
-- FastAPI backend + TypeScript frontend
+</div>
 
---------------------------------------------------
+---
 
-# 🎯 Objectives
+## Table of Contents
 
-1. Classify financial news:
-   - Bullish
-   - Bearish
-   - Neutral
+- [Overview](#overview)
+- [System Architecture](#system-architecture)
+- [Data Flow & Workflow](#data-flow--workflow)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [API Reference](#api-reference)
+- [Database Schema](#database-schema)
+- [Known Limitations](#known-limitations)
 
-2. Determine:
-   - Impact level
-   - Affected sectors
-   - Affected assets
+---
 
-3. Generate:
-   - Buy / Hold / Sell signals
-   - Confidence scores
-   - Price movement ranges
+## Overview
 
-4. Detect:
-   - Breaking news clusters
-   - Historical analogs
+Financial News Classifier Agent is a full-stack financial intelligence platform that:
 
-5. Track:
-   - 1-hour prediction accuracy
-   - 1-day prediction accuracy
+1. **Streams live market news** from Finnhub via REST polling and WebSocket
+2. **Classifies news articles** using a Groq-powered AI agent — extracting sentiment, impact level, trading signals, affected sectors, and confidence scores
+3. **Personalizes the experience per user** — each user has their own watchlist/task panel and a private classification history with analytics
+4. **Restricts classification** to financial news only — non-financial text is blocked client-side before the API is ever called
+5. **Visualizes market sentiment** in real time through charts, heatmaps, and signal panels
 
---------------------------------------------------
+---
 
-# 🚀 Key Features
+## System Architecture
 
-## Real-Time News Monitoring
-Sources:
-- Alpha Vantage
-- Finnhub
-- NewsAPI
-- Yahoo Finance
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         CLIENT (Browser)                            │
+│                                                                     │
+│  ┌─────────────┐   ┌──────────────┐   ┌───────────────────────┐   │
+│  │  AuthPage   │   │  Dashboard   │   │   React Query Cache   │   │
+│  │  (Login /   │   │  (Index.tsx) │   │   (live-news, signals │   │
+│  │  Register)  │   │              │   │    useNews, useSignals)│   │
+│  └──────┬──────┘   └──────┬───────┘   └───────────────────────┘   │
+│         │                 │                                         │
+│         │        ┌────────┴──────────────────────┐                 │
+│         │        │         React Hooks            │                 │
+│         │        │  useAuth · useNews · useClassify│                │
+│         │        │  useTasks · useAnalytics        │                │
+│         │        │  useSignals                     │                │
+│         │        └──────────┬────────────────┬─────┘               │
+│         │                   │                │                      │
+└─────────┼───────────────────┼────────────────┼──────────────────────┘
+          │                   │                │
+          │ Auth/DB           │ REST           │ WebSocket
+          ▼                   ▼                ▼
+┌─────────────────┐  ┌────────────────┐  ┌──────────────────┐
+│    Supabase     │  │  FastAPI       │  │  FastAPI         │
+│                 │  │  Backend       │  │  WebSocket       │
+│  ┌───────────┐  │  │                │  │                  │
+│  │   Auth    │  │  │  POST          │  │  /ws/news        │
+│  │  (users)  │  │  │  /classify-news│  │                  │
+│  ├───────────┤  │  │                │  │  Polls Finnhub   │
+│  │user_tasks │  │  │  GET           │  │  every 30s,      │
+│  ├───────────┤  │  │  /live-news    │  │  streams new     │
+│  │news_history│ │  │                │  │  articles to     │
+│  └───────────┘  │  │  GET           │  │  connected       │
+│                 │  │  /signals      │  │  clients         │
+│  Row Level      │  │                │  └────────┬─────────┘
+│  Security (RLS) │  └───────┬────────┘           │
+│  per user_id    │          │                     │
+└─────────────────┘          │                     │
+                             ▼                     ▼
+                   ┌──────────────────┐  ┌──────────────────┐
+                   │   Groq AI API    │  │  Finnhub API     │
+                   │                 │  │                  │
+                   │  LLM inference  │  │  Live market     │
+                   │  for news       │  │  news feed       │
+                   │  classification │  │  (general cat.)  │
+                   └─────────────────┘  └──────────────────┘
+```
 
-Features:
-- Streaming ingestion
-- Duplicate filtering
-- Breaking-news detection
-- Event clustering
+---
 
---------------------------------------------------
+## Data Flow & Workflow
 
-## AI News Classification Agent
+### 1. Authentication Flow
 
-Classifies:
+```
+User visits /
+      │
+      ▼
+AuthGuard checks Supabase session
+      │
+  No session ──────────────► /auth (AuthPage)
+      │                           │
+  Has session                 Login / Register
+      │                           │
+      ▼                    Supabase Auth
+  Dashboard (/)            creates session
+                                  │
+                                  ▼
+                           Redirect to /
+```
 
-Sentiment:
-- Bullish
-- Bearish
-- Neutral
+### 2. Live News Feed Flow
 
-Impact:
-- Low
-- Medium
-- High
+```
+Frontend mounts
+      │
+      ├──► REST: GET /live-news
+      │         │
+      │         ▼
+      │    FastAPI → Finnhub API
+      │         │
+      │         ▼
+      │    Returns 5 raw news items
+      │         │
+      │         ▼
+      │    mapFinnhub() normalises to ClassifiedNews shape
+      │    (sentiment=neutral, signal=hold, confidence=0)
+      │         │
+      │         ▼
+      │    Displayed in News Feed
+      │
+      └──► WebSocket: ws://localhost:8000/ws/news
+                │
+                ▼
+           ConnectionManager accepts client
+                │
+                ▼
+           get_news_stream() async generator
+           polls Finnhub every 30s
+                │
+                ▼
+           New articles pushed to all connected clients
+                │
+                ▼
+           Frontend deduplicates by ID, prepends to feed
+```
 
-Sectors:
-- Technology
-- Banking
-- Energy
-- Crypto
-- Commodities
+### 3. AI Classification Flow
 
-Assets:
-- Stocks
-- ETFs
-- Forex
-- Crypto
+```
+User types in NewsAnalyzer
+        │
+        ▼
+isFinancialNews() — client-side validation
+        │
+   Not financial ──► ⚠ Warning shown, button disabled
+        │
+   Is financial
+        │
+        ▼
+POST /classify-news { article: "..." }
+        │
+        ▼
+FastAPI → groq_service.classify_news()
+        │
+        ▼
+Groq LLM extracts:
+  • sentiment     (bullish / bearish / neutral)
+  • impactLevel   (high / medium / low)
+  • tradingSignal (buy / sell / hold)
+  • confidenceScore (0.0–1.0)
+  • affectedSectors []
+  • entities []
+  • priceMovement
+  • summary
+        │
+        ▼
+Response returned to frontend
+        │
+        ├──► Prepended to News Feed (manual items first)
+        │
+        ├──► useAnalytics.record() saves to Supabase news_history
+        │         (scoped to current user via RLS)
+        │
+        └──► StatsBar, SentimentChart, SectorHeatmap, TradingSignals
+             all recompute from updated allNews array
+```
 
-Powered By:
-- Groq LLM
-- Prompt engineering
-- Causal NLP
+### 4. Per-User Personalisation Flow
 
---------------------------------------------------
+```
+Authenticated user
+        │
+        ├──► useTasks(userId)
+        │       Reads/writes user_tasks table (Supabase)
+        │       RLS: user sees only their own tasks
+        │       TaskPanel: add ticker + note, check off, delete
+        │
+        └──► useAnalytics(userId)
+                Reads news_history table (Supabase)
+                RLS: user sees only their own history
+                AnalyticsPanel:
+                  • Bullish / Bearish / Neutral counts
+                  • Avg confidence score
+                  • Stacked bar chart by day
+                  • Recent classification list
+```
 
-## Trading Signal Generator
+---
 
-Sample Output:
+## Features
 
-{
- signal: BUY
- confidence: 87%
- expected_move: +2.4%
- horizon: 1D
-}
+| Feature | Description |
+|---|---|
+| 🔐 **Multi-user Auth** | Supabase email/password auth with protected routes |
+| 📰 **Live News Feed** | Finnhub REST polling (60s) + WebSocket streaming (30s) |
+| 🤖 **AI Classification** | Groq LLM extracts sentiment, signals, sectors, confidence |
+| 🚫 **Financial-only Guard** | Client-side keyword validation blocks non-financial text |
+| 📋 **Per-user Watchlist** | Ticker-tagged tasks stored in Supabase with RLS |
+| 📊 **Personal Analytics** | Historical classification chart scoped per user |
+| 📡 **Real-time WebSocket** | Live news pushed to all connected browser tabs |
+| 🗺️ **Sector Heatmap** | Visual bullish/bearish breakdown by market sector |
+| 🎯 **Trading Signals** | Buy/Sell/Hold signals from classified news |
+| 🌗 **Connection Status** | Live indicator: LIVE / REST ONLY / LOADING |
 
-Signals use:
-- News sentiment
-- Historical analogs
-- Volatility
-- Sector correlations
+---
 
---------------------------------------------------
+## Tech Stack
 
-## Market Reaction Predictor
+### Frontend
+| Tool | Purpose |
+|---|---|
+| React 18 + TypeScript | UI framework |
+| Vite | Build tool & dev server |
+| Tailwind CSS | Utility-first styling |
+| TanStack React Query | Server state, caching, refetching |
+| React Router v6 | Client-side routing + auth guards |
+| Recharts | Sentiment pie chart, analytics bar chart |
+| Supabase JS Client | Auth session, DB reads/writes |
+| Sonner | Toast notifications |
+| Lucide React | Icons |
+| date-fns | Date formatting |
 
-Predicts:
-- Price direction
-- Volatility probability
-- Spillover effects
+### Backend
+| Tool | Purpose |
+|---|---|
+| FastAPI | REST API + WebSocket server |
+| Uvicorn | ASGI server |
+| Groq SDK | LLM inference for classification |
+| Finnhub API | Live market news source |
+| yfinance | Price data for signal accuracy |
+| SQLAlchemy | ORM (impact tracking) |
+| python-dotenv | Environment variable management |
+| websockets | WebSocket protocol support |
 
-Uses:
-- Correlation engine
-- Similar event retrieval
-- Reinforcement feedback
+### Infrastructure
+| Tool | Purpose |
+|---|---|
+| Supabase | Auth, PostgreSQL DB, Row Level Security |
+| Finnhub | Financial news data source |
+| Groq | Ultra-fast LLM inference |
 
---------------------------------------------------
+---
 
-## Accuracy Tracker
+## Project Structure
 
-Tracks:
-- Hit ratio
-- False signals
-- Simulated PnL
-- Confidence calibration
-
---------------------------------------------------
-
-# 🧠 Tech Stack
-
-Frontend:
-- React
-- TypeScript
-- Tailwind
-- WebSockets
-- Recharts
-
-Backend:
-- FastAPI
-- Python
-- Groq API
-- SQLite/PostgreSQL
-
-AI:
-- Groq LLM
-- FinBERT optional
-- Sentence Transformers
-- RL feedback loop
-
---------------------------------------------------
-
-# 📂 Project Structure
-
-Financial-News-Classifier-Agent/
+```
+Financial News Classifier Agent/
 │
-├── frontend/
-│   ├── src/
-│   │
-│   ├── components/
-│   │   ├── NewsAnalyzer.tsx
-│   │   ├── TradingSignals.tsx
-│   │   ├── SectorHeatmap.tsx
-│   │   └── AccuracyTracker.tsx
-│   │
-│   ├── pages/
-│   │   └── Dashboard.tsx
-│   │
-│   ├── api/
-│   │   └── api.ts
-│   │
-│   ├── App.tsx
-│   └── package.json
-│
-├── backend/
+├── Backend/                          # FastAPI Python backend
 │   ├── app/
-│   │
-│   ├── main.py
-│   │
-│   ├── routes/
-│   │   ├── classify.py
-│   │   ├── signals.py
-│   │   └── websocket.py
-│   │
-│   ├── services/
-│   │   ├── groq_service.py
-│   │   ├── news_stream_service.py
-│   │   └── impact_tracker.py
-│   │
-│   ├── models/
-│   │   └── prediction_model.py
-│   │
+│   │   ├── main.py                   # App entry, CORS, router registration
+│   │   ├── models/
+│   │   │   └── prediction_model.py   # ML prediction model
+│   │   ├── routes/
+│   │   │   ├── classify.py           # POST /classify-news
+│   │   │   ├── news.py               # GET /live-news
+│   │   │   ├── signals.py            # GET /signals, GET /accuracy/{ticker}/{signal}
+│   │   │   └── websocket.py          # WebSocket /ws/news
+│   │   └── services/
+│   │       ├── groq_service.py       # Groq LLM classification logic
+│   │       ├── impact_tracker.py     # Signal accuracy tracking
+│   │       └── news_stream_service.py# Finnhub REST + async WS generator
 │   └── requirements.txt
 │
-├── database/
-│   └── news_predictions.db
+├── src/                              # React + TypeScript frontend
+│   ├── components/
+│   │   ├── AnalyticsPanel.tsx        # Per-user history chart
+│   │   ├── NewsAnalyzer.tsx          # AI classifier input (financial-only)
+│   │   ├── NewsCard.tsx              # Individual news article card
+│   │   ├── SectorHeatmap.tsx         # Market sector sentiment grid
+│   │   ├── SentimentChart.tsx        # Bullish/bearish/neutral pie chart
+│   │   ├── StatsBar.tsx              # Top-level stats (articles, signals, etc.)
+│   │   ├── TaskPanel.tsx             # Per-user watchlist/tasks
+│   │   └── TradingSignals.tsx        # Buy/Sell/Hold signal list
+│   ├── hooks/
+│   │   ├── useAuth.ts                # Supabase auth state + actions
+│   │   ├── useAnalytics.ts           # Per-user classification history
+│   │   ├── useClassify.ts            # POST /classify-news mutation + validation
+│   │   ├── useNews.ts                # GET /live-news + WebSocket stream
+│   │   ├── useSignals.ts             # GET /signals query
+│   │   └── useTasks.ts               # Per-user task CRUD (Supabase)
+│   ├── lib/
+│   │   ├── api.ts                    # Typed API client (fetch wrapper + WS)
+│   │   ├── types.ts                  # Shared TypeScript types
+│   │   └── utils.ts                  # Utility functions
+│   ├── pages/
+│   │   ├── AuthPage.tsx              # Login / Register screen
+│   │   ├── Index.tsx                 # Main dashboard
+│   │   └── NotFound.tsx              # 404 page
+│   ├── integrations/supabase/
+│   │   └── client.ts                 # Supabase client singleton
+│   ├── App.tsx                       # Router + Auth/Public guards
+│   └── main.tsx                      # React entry point
 │
+├── supabase_schema.sql               # DB tables + RLS policies
+├── .env                              # Frontend env vars (gitignored)
 └── README.md
+```
 
---------------------------------------------------
+---
 
-# Backend Modules
+## Getting Started
 
-main.py
-- FastAPI app startup
-- Registers routes
-- Middleware
-- WebSocket handling
+### Prerequisites
 
---------------------------------------------------
+- Node.js 18+ and npm/bun
+- Python 3.10+
+- A [Supabase](https://supabase.com) project
+- A [Groq](https://console.groq.com) API key
+- A [Finnhub](https://finnhub.io) API key (free tier)
 
-routes/classify.py
+### 1. Clone the repository
 
-POST /classify-news
+```bash
+git clone https://github.com/your-username/finpulse.git
+cd finpulse
+```
 
-Returns:
-- Sentiment
-- Impact
-- Sector predictions
-- Asset mapping
+### 2. Set up the database
 
---------------------------------------------------
+Go to your **Supabase project → SQL Editor** and run the contents of `supabase_schema.sql`.
 
-routes/signals.py
+Then go to **Supabase → Authentication → Providers → Email** and disable **"Confirm email"** for local development (re-enable it in production).
 
-POST /generate-signal
-GET /signals/live
+### 3. Configure environment variables
 
-Outputs:
-- Buy/Hold/Sell
-- Confidence score
-- Price estimate
+Create a `.env` file in the project root:
 
---------------------------------------------------
+```env
+VITE_API_URL=http://localhost:8000
+VITE_WS_URL=ws://localhost:8000
+```
 
-routes/websocket.py
+Your Supabase URL and anon key should already be in `src/integrations/supabase/client.ts`.
 
-Streams:
-- Breaking news
-- Live signals
-- Accuracy updates
+Create `Backend/.env`:
 
---------------------------------------------------
+```env
+GROQ_API_KEY=your_groq_api_key_here
+FINNHUB_API_KEY=your_finnhub_api_key_here
+```
 
-services/groq_service.py
+### 4. Start the backend
 
-Responsibilities:
-- Groq prompting
-- Financial reasoning
-- Causal extraction
-- Signal generation
-
-Prompt Example:
-
-Analyze this news:
-Classify sentiment
-Predict impacted sectors
-Generate trading signal
-Return confidence score
-
---------------------------------------------------
-
-services/news_stream_service.py
-
-Handles:
-- News APIs
-- Deduplication
-- Event clustering
-
---------------------------------------------------
-
-services/impact_tracker.py
-
-Pipeline:
-
-Prediction
-↓
-Actual market movement
-↓
-Accuracy score
-
-Stores:
-- 1 hr results
-- 1 day results
-- Reinforcement feedback
-
---------------------------------------------------
-
-models/prediction_model.py
-
-Hybrid model:
-- Similarity matching
-- Confidence scoring
-- Market reaction prediction
-
---------------------------------------------------
-
-# Frontend Dashboard
-
-Dashboard Includes:
-
-1 News Analyzer
-- Incoming articles
-- Sentiment labels
-- Impact score
-
-2 Trading Signals
-Example:
-
-BUY TSLA
-Confidence 82%
-Expected Move +3.1%
-
-3 Sector Heatmap
-Shows sector reactions:
-- Green bullish
-- Red bearish
-
-4 Accuracy Tracker
-Displays:
-- Hit rate
-- Sharpe ratio
-- Confidence calibration
-
---------------------------------------------------
-
-# API Endpoints
-
-POST /api/classify
-
-Input:
-
-{
- "headline":"Fed signals interest rate cuts"
-}
-
-Output:
-
-{
- "sentiment":"bullish",
- "impact":"high",
- "sectors":["Banking","Tech"],
- "assets":["SPY","QQQ"],
- "confidence":91
-}
-
---------------------------------
-
-POST /api/signal
-
-Response:
-
-{
- "signal":"BUY",
- "confidence":87,
- "expected_move":"+2.4%"
-}
-
---------------------------------
-
-GET /api/accuracy
-
---------------------------------------------------
-
-# Groq Integration
-
-Why Groq:
-- Ultra low latency
-- Fast inference
-- Financial reasoning
-
-.env
-
-GROQ_API_KEY=your_key
-NEWS_API_KEY=your_news_key
-DATABASE_URL=sqlite:///database/news_predictions.db
-
---------------------------------------------------
-
-# Installation
-
-Clone:
-
-git clone https://github.com/yourrepo/Financial-News-Classifier-Agent.git
-
-cd Financial-News-Classifier-Agent
-
---------------------------------------------------
-
-Backend:
-
-cd backend
-
+```bash
+cd Backend
 pip install -r requirements.txt
-
 uvicorn app.main:app --reload
+```
 
---------------------------------------------------
+Backend runs at `http://localhost:8000`. Visit it to confirm:
 
-Frontend:
+```json
+{ "message": "Financial News Classifier API Running" }
+```
 
-cd frontend
+### 5. Start the frontend
 
-npm install
+```bash
+# From project root
+npm install      # or: bun install
+npm run dev      # or: bun dev
+```
 
-npm run dev
+Frontend runs at `http://localhost:8080` (or `5173` depending on Vite config).
 
---------------------------------------------------
+### 6. Register and log in
 
-requirements.txt
+Navigate to `http://localhost:8080` → you'll be redirected to `/auth`. Register an account, then sign in.
 
-fastapi
-uvicorn
-groq
-sqlalchemy
-requests
-websockets
-pydantic
-python-dotenv
-scikit-learn
-pandas
-numpy
+---
 
---------------------------------------------------
+## Environment Variables
 
-# Workflow
+### Frontend (`.env` in project root)
 
-News Feed
-↓
-Stream Processor
-↓
-Groq Classification
-↓
-Sector Mapping
-↓
-Signal Generator
-↓
-Accuracy Tracker
-↓
-RL Feedback Loop
+| Variable | Description | Default |
+|---|---|---|
+| `VITE_API_URL` | FastAPI backend base URL | `http://localhost:8000` |
+| `VITE_WS_URL` | WebSocket base URL | `ws://localhost:8000` |
 
---------------------------------------------------
+### Backend (`Backend/.env`)
 
-# Reinforcement Learning Feedback
+| Variable | Description |
+|---|---|
+| `GROQ_API_KEY` | Your Groq API key from console.groq.com |
+| `FINNHUB_API_KEY` | Your Finnhub API key from finnhub.io |
 
-Prediction
-↓
-Store signal
-↓
-Observe market outcome
-↓
-Reward or penalty
-↓
-Adjust future confidence
+---
 
-Improves:
-- Reliability
-- Event analog detection
-- Risk calibration
+## API Reference
 
---------------------------------------------------
+### `POST /classify-news`
 
-# Example Use Cases
+Classifies a financial news article using the Groq AI agent.
 
-Example 1
+**Request body:**
+```json
+{ "article": "Fed raises interest rates by 25 basis points amid inflation concerns" }
+```
 
-News:
-NVIDIA beats earnings expectations
+**Response:**
+```json
+{
+  "id": "uuid",
+  "title": "Fed raises interest rates...",
+  "summary": "The Federal Reserve increased rates...",
+  "sentiment": "bearish",
+  "impactLevel": "high",
+  "tradingSignal": "sell",
+  "confidenceScore": 0.87,
+  "affectedSectors": ["Financials", "Real Estate"],
+  "entities": ["Federal Reserve", "USD"],
+  "priceMovement": "-1.2% expected",
+  "source": "User Input",
+  "publishedAt": "2024-01-15T10:30:00Z"
+}
+```
 
-Output:
-Bullish
-High Impact
+### `GET /live-news`
 
-Affected:
-- Semiconductors
-- Nasdaq
+Returns up to 5 latest articles from Finnhub. Returns `[]` on rate-limit or network error.
 
-Signal:
-BUY NVDA
-Confidence 89%
+### `GET /signals`
 
---------------------------------------------------
+Returns current trading signals.
 
-Example 2
+```json
+{ "signals": [{ "asset": "AAPL", "signal": "BUY", "confidence": 87 }] }
+```
 
-News:
-Oil supply disruption
+### `GET /accuracy/{ticker}/{signal}`
 
-Output:
-Bullish Energy
-Bearish Airlines
+Returns historical accuracy for a given ticker + signal pair.
 
-Signals:
-BUY XOM
-SELL Airline ETF
+### `WebSocket /ws/news`
 
---------------------------------------------------
+Connect to receive live news articles as JSON. New articles are pushed every time `get_news_stream()` yields a new unseen item (polls Finnhub every 30s).
 
-# Evaluation Metrics
+---
 
-Classification:
-- Precision
-- Recall
-- F1 Score
+## Database Schema
 
-Trading:
-- Signal Hit Rate
-- Sharpe Ratio
-- Drawdown
+### `user_tasks`
 
-Prediction:
-- 1hr Accuracy
-- 1day Accuracy
+| Column | Type | Description |
+|---|---|---|
+| `id` | uuid | Primary key |
+| `user_id` | uuid | References `auth.users` |
+| `title` | text | Task description |
+| `ticker` | text | Optional ticker symbol (e.g. AAPL) |
+| `note` | text | Optional note |
+| `done` | boolean | Completion state |
+| `created_at` | timestamptz | Creation timestamp |
 
---------------------------------------------------
+RLS: users can only read/write their own rows.
 
-# Future Enhancements
+### `news_history`
 
-- Multi-agent debate
-- Vector DB memory
-- RAG historical event retrieval
-- Autonomous trading bot
-- Portfolio optimizer
-- Options signal generation
+| Column | Type | Description |
+|---|---|---|
+| `id` | uuid | Primary key |
+| `user_id` | uuid | References `auth.users` |
+| `title` | text | Article headline |
+| `sentiment` | text | `bullish` / `bearish` / `neutral` |
+| `impact_level` | text | `high` / `medium` / `low` |
+| `trading_signal` | text | `buy` / `sell` / `hold` |
+| `confidence_score` | float | 0.0 – 1.0 |
+| `affected_sectors` | text[] | List of market sectors |
+| `source` | text | News source |
+| `classified_at` | timestamptz | When the user classified it |
+
+RLS: users can only read/write their own rows.
+
+---
+
+## Known Limitations
+
+| Issue | Detail |
+|---|---|
+| **Finnhub free tier rate limits** | The free plan allows ~60 calls/min. During high traffic the `/live-news` endpoint returns `[]` gracefully instead of crashing. Upgrade to a paid plan or add a caching layer for production. |
+| **Finnhub `datetime=0`** | Some Finnhub articles return a unix timestamp of `0`. The frontend treats this as "just now" and does not crash. |
+| **Groq classification shape** | The response shape from `groq_service.classify_news()` must exactly match the `ClassifyResponse` TypeScript interface. If fields are missing the UI will show fallback values. |
+| **WebSocket reconnection** | The current WebSocket client does not auto-reconnect on drop. Refresh the page to re-establish. |
+| **Email confirmation** | Supabase requires email confirmation by default. Disable it in Supabase → Auth → Providers → Email for local dev. |
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+
+Built with ⚡ by combining FastAPI · React · Groq · Supabase · Finnhub
+
+</div>

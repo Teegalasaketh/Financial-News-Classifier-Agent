@@ -58,7 +58,7 @@ export default function Index() {
           <div className="flex items-center gap-3">
             <Activity className="w-6 h-6 text-primary" />
             <div>
-              <h1 className="text-base font-bold text-foreground tracking-tight">FinPulse</h1>
+              <h1 className="text-base font-bold text-foreground tracking-tight">Financial News Classifier Agent</h1>
               <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
                 Market Impact Classifier
               </p>

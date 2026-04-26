@@ -1,25 +1,3 @@
-/**
- * useAnalytics.ts
- * Stores every classification result per user in Supabase table `news_history`.
- * Used to render the historical analytics chart.
- *
- * Table schema:
- *   create table news_history (
- *     id uuid primary key default gen_random_uuid(),
- *     user_id uuid references auth.users not null,
- *     title text,
- *     sentiment text,
- *     impact_level text,
- *     trading_signal text,
- *     confidence_score float,
- *     affected_sectors text[],
- *     source text,
- *     classified_at timestamptz default now()
- *   );
- *   alter table news_history enable row level security;
- *   create policy "Users read own history"
- *     on news_history for all using (auth.uid() = user_id);
- */
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -54,7 +32,7 @@ export function useAnalytics(userId: string | undefined) {
   const fetchHistory = useCallback(async () => {
     if (!userId) return;
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('news_history')
       .select('*')
       .eq('user_id', userId)
@@ -82,7 +60,7 @@ export function useAnalytics(userId: string | undefined) {
 
   /** Call this after every successful classification to persist it */
   const record = async (userId: string, result: ClassifyResponse) => {
-    await supabase.from('news_history').insert({
+    await (supabase as any).from('news_history').insert({
       user_id: userId,
       title: result.title,
       sentiment: result.sentiment,

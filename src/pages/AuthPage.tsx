@@ -57,7 +57,9 @@ export default function AuthPage() {
               <Activity className="w-5 h-5 text-[#00ff64]" />
             </div>
             <div className="text-left">
-              <div className="text-xl font-bold text-[#00ff64] tracking-[0.2em] font-mono">FINPULSE</div>
+              <div className="text-lg font-bold text-[#00ff64] tracking-[0.05em] font-mono whitespace-nowrap">
+  Financial News Classifier Agent
+</div>
               <div className="text-[9px] font-mono text-[#00ff64]/50 tracking-[0.3em]">MARKET INTELLIGENCE</div>
             </div>
           </div>
