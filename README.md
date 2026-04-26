@@ -1,162 +1,541 @@
-# 📊 Financial News Classifier Agent
+# README.md — Financial News Classifier Agent
 
-A modern web-based application that analyzes financial news articles using **Groq-powered AI**, classifies them, and generates insights like sentiment, sector impact, and trading signals.
+# 📈 Financial News Classifier Agent
 
-Built with **React + TypeScript + Vite**, and powered by **Groq LLM API** for fast inference.
+## Abstract
+Financial analysts, traders, and portfolio managers struggle to process breaking economic news across thousands of sources in real time, often failing to separate market-moving events from noise due to sensational headlines, delayed reporting, and information overload.
 
----
+Traditional news aggregators provide limited actionable intelligence, lacking:
+- Market impact prediction
+- Sector and asset effect mapping
+- Real-time trading signals
+- Event causality analysis
 
-## 🚀 Features
+This project proposes an AI-powered Financial News Classifier Agent that ingests real-time financial news streams, classifies market sentiment, predicts affected sectors and assets, generates trading signals, and measures prediction accuracy using actual market outcomes.
 
-* 📰 **News Analysis (AI-Powered)**
+The system combines:
+- Real-time news ingestion
+- Large Language Models (Groq API)
+- Causal NLP analysis
+- Historical market correlation engine
+- Reinforcement learning from outcomes
+- FastAPI backend + TypeScript frontend
 
-  * Input financial news text
-  * Processed using Groq LLMs for intelligent classification
+--------------------------------------------------
 
-* 😊 **Sentiment Analysis**
+# 🎯 Objectives
 
-  * Positive / Negative / Neutral detection
-  * AI-driven interpretation of tone
+1. Classify financial news:
+   - Bullish
+   - Bearish
+   - Neutral
 
-* 🏭 **Sector Classification**
+2. Determine:
+   - Impact level
+   - Affected sectors
+   - Affected assets
 
-  * Identifies impacted industries (e.g., Tech, Banking, Energy)
+3. Generate:
+   - Buy / Hold / Sell signals
+   - Confidence scores
+   - Price movement ranges
 
-* 📈 **Trading Signals**
+4. Detect:
+   - Breaking news clusters
+   - Historical analogs
 
-  * Generates insights like Buy / Sell / Hold based on sentiment
+5. Track:
+   - 1-hour prediction accuracy
+   - 1-day prediction accuracy
 
-* ⚡ **Ultra-fast Inference**
+--------------------------------------------------
 
-  * Powered by **Groq API** for low-latency responses
+# 🚀 Key Features
 
-* 📊 **Visualization**
+## Real-Time News Monitoring
+Sources:
+- Alpha Vantage
+- Finnhub
+- NewsAPI
+- Yahoo Finance
 
-  * Charts and dashboards using Recharts
+Features:
+- Streaming ingestion
+- Duplicate filtering
+- Breaking-news detection
+- Event clustering
 
----
+--------------------------------------------------
 
-## 🛠️ Tech Stack
+## AI News Classification Agent
 
-* **Frontend:** React 18 + TypeScript
-* **Build Tool:** Vite
-* **UI:** Tailwind CSS + shadcn/ui
-* **Charts:** Recharts
-* **API / AI Engine:** Groq LLM API
-* **Optional Backend:** Supabase / Serverless Functions
+Classifies:
 
----
+Sentiment:
+- Bullish
+- Bearish
+- Neutral
 
-## 📂 Project Structure
+Impact:
+- Low
+- Medium
+- High
 
-```
+Sectors:
+- Technology
+- Banking
+- Energy
+- Crypto
+- Commodities
+
+Assets:
+- Stocks
+- ETFs
+- Forex
+- Crypto
+
+Powered By:
+- Groq LLM
+- Prompt engineering
+- Causal NLP
+
+--------------------------------------------------
+
+## Trading Signal Generator
+
+Sample Output:
+
+{
+ signal: BUY
+ confidence: 87%
+ expected_move: +2.4%
+ horizon: 1D
+}
+
+Signals use:
+- News sentiment
+- Historical analogs
+- Volatility
+- Sector correlations
+
+--------------------------------------------------
+
+## Market Reaction Predictor
+
+Predicts:
+- Price direction
+- Volatility probability
+- Spillover effects
+
+Uses:
+- Correlation engine
+- Similar event retrieval
+- Reinforcement feedback
+
+--------------------------------------------------
+
+## Accuracy Tracker
+
+Tracks:
+- Hit ratio
+- False signals
+- Simulated PnL
+- Confidence calibration
+
+--------------------------------------------------
+
+# 🧠 Tech Stack
+
+Frontend:
+- React
+- TypeScript
+- Tailwind
+- WebSockets
+- Recharts
+
+Backend:
+- FastAPI
+- Python
+- Groq API
+- SQLite/PostgreSQL
+
+AI:
+- Groq LLM
+- FinBERT optional
+- Sentence Transformers
+- RL feedback loop
+
+--------------------------------------------------
+
+# 📂 Project Structure
+
 Financial-News-Classifier-Agent/
 │
-├── public/
-├── src/
+├── frontend/
+│   ├── src/
+│   │
 │   ├── components/
 │   │   ├── NewsAnalyzer.tsx
-│   │   ├── SentimentChart.tsx
-│   │   ├── SectorHeatmap.tsx
 │   │   ├── TradingSignals.tsx
-│   │   └── ui/
+│   │   ├── SectorHeatmap.tsx
+│   │   └── AccuracyTracker.tsx
+│   │
+│   ├── pages/
+│   │   └── Dashboard.tsx
+│   │
+│   ├── api/
+│   │   └── api.ts
 │   │
 │   ├── App.tsx
-│   └── App.css
+│   └── package.json
 │
-├── index.html
-├── package.json
-```
+├── backend/
+│   ├── app/
+│   │
+│   ├── main.py
+│   │
+│   ├── routes/
+│   │   ├── classify.py
+│   │   ├── signals.py
+│   │   └── websocket.py
+│   │
+│   ├── services/
+│   │   ├── groq_service.py
+│   │   ├── news_stream_service.py
+│   │   └── impact_tracker.py
+│   │
+│   ├── models/
+│   │   └── prediction_model.py
+│   │
+│   └── requirements.txt
+│
+├── database/
+│   └── news_predictions.db
+│
+└── README.md
 
----
+--------------------------------------------------
 
-## ⚙️ Setup & Installation
+# Backend Modules
 
-### 1. Clone repo
+main.py
+- FastAPI app startup
+- Registers routes
+- Middleware
+- WebSocket handling
 
-```bash
-git clone <repo-url>
+--------------------------------------------------
+
+routes/classify.py
+
+POST /classify-news
+
+Returns:
+- Sentiment
+- Impact
+- Sector predictions
+- Asset mapping
+
+--------------------------------------------------
+
+routes/signals.py
+
+POST /generate-signal
+GET /signals/live
+
+Outputs:
+- Buy/Hold/Sell
+- Confidence score
+- Price estimate
+
+--------------------------------------------------
+
+routes/websocket.py
+
+Streams:
+- Breaking news
+- Live signals
+- Accuracy updates
+
+--------------------------------------------------
+
+services/groq_service.py
+
+Responsibilities:
+- Groq prompting
+- Financial reasoning
+- Causal extraction
+- Signal generation
+
+Prompt Example:
+
+Analyze this news:
+Classify sentiment
+Predict impacted sectors
+Generate trading signal
+Return confidence score
+
+--------------------------------------------------
+
+services/news_stream_service.py
+
+Handles:
+- News APIs
+- Deduplication
+- Event clustering
+
+--------------------------------------------------
+
+services/impact_tracker.py
+
+Pipeline:
+
+Prediction
+↓
+Actual market movement
+↓
+Accuracy score
+
+Stores:
+- 1 hr results
+- 1 day results
+- Reinforcement feedback
+
+--------------------------------------------------
+
+models/prediction_model.py
+
+Hybrid model:
+- Similarity matching
+- Confidence scoring
+- Market reaction prediction
+
+--------------------------------------------------
+
+# Frontend Dashboard
+
+Dashboard Includes:
+
+1 News Analyzer
+- Incoming articles
+- Sentiment labels
+- Impact score
+
+2 Trading Signals
+Example:
+
+BUY TSLA
+Confidence 82%
+Expected Move +3.1%
+
+3 Sector Heatmap
+Shows sector reactions:
+- Green bullish
+- Red bearish
+
+4 Accuracy Tracker
+Displays:
+- Hit rate
+- Sharpe ratio
+- Confidence calibration
+
+--------------------------------------------------
+
+# API Endpoints
+
+POST /api/classify
+
+Input:
+
+{
+ "headline":"Fed signals interest rate cuts"
+}
+
+Output:
+
+{
+ "sentiment":"bullish",
+ "impact":"high",
+ "sectors":["Banking","Tech"],
+ "assets":["SPY","QQQ"],
+ "confidence":91
+}
+
+--------------------------------
+
+POST /api/signal
+
+Response:
+
+{
+ "signal":"BUY",
+ "confidence":87,
+ "expected_move":"+2.4%"
+}
+
+--------------------------------
+
+GET /api/accuracy
+
+--------------------------------------------------
+
+# Groq Integration
+
+Why Groq:
+- Ultra low latency
+- Fast inference
+- Financial reasoning
+
+.env
+
+GROQ_API_KEY=your_key
+NEWS_API_KEY=your_news_key
+DATABASE_URL=sqlite:///database/news_predictions.db
+
+--------------------------------------------------
+
+# Installation
+
+Clone:
+
+git clone https://github.com/yourrepo/Financial-News-Classifier-Agent.git
+
 cd Financial-News-Classifier-Agent
-```
 
-### 2. Install dependencies
+--------------------------------------------------
 
-```bash
+Backend:
+
+cd backend
+
+pip install -r requirements.txt
+
+uvicorn app.main:app --reload
+
+--------------------------------------------------
+
+Frontend:
+
+cd frontend
+
 npm install
-```
 
----
-
-## 🔑 Groq API Setup
-
-1. Go to Groq and create an account
-2. Generate an API key
-3. Create a `.env` file in the root:
-
-```
-VITE_GROQ_API_KEY=your_api_key_here
-```
-
----
-
-## ▶️ Run the App
-
-```bash
 npm run dev
-```
 
-Open:
+--------------------------------------------------
 
-```
-http://localhost:5173
-```
+requirements.txt
 
----
+fastapi
+uvicorn
+groq
+sqlalchemy
+requests
+websockets
+pydantic
+python-dotenv
+scikit-learn
+pandas
+numpy
 
-## 🧠 How It Works
+--------------------------------------------------
 
-1. User inputs financial news text
-2. The app sends the text to **Groq LLM API**
-3. AI processes:
+# Workflow
 
-   * Sentiment
-   * Sector classification
-   * Trading signal
-4. Results are displayed via charts and UI components
+News Feed
+↓
+Stream Processor
+↓
+Groq Classification
+↓
+Sector Mapping
+↓
+Signal Generator
+↓
+Accuracy Tracker
+↓
+RL Feedback Loop
 
----
+--------------------------------------------------
 
-## 📦 Build
+# Reinforcement Learning Feedback
 
-```bash
-npm run build
-npm run preview
-```
+Prediction
+↓
+Store signal
+↓
+Observe market outcome
+↓
+Reward or penalty
+↓
+Adjust future confidence
 
----
+Improves:
+- Reliability
+- Event analog detection
+- Risk calibration
 
-## 🔮 Future Improvements
+--------------------------------------------------
 
-* 🔍 Live financial news API integration
-* 🤖 Fine-tuned financial ML models
-* 📊 Portfolio impact analysis
-* 📱 Mobile optimization
-* 🧠 Multi-agent AI reasoning
+# Example Use Cases
 
----
+Example 1
 
-## 📄 License
+News:
+NVIDIA beats earnings expectations
 
-For educational and experimental use.
+Output:
+Bullish
+High Impact
 
----
+Affected:
+- Semiconductors
+- Nasdaq
 
-## 👨‍💻 Author
+Signal:
+BUY NVDA
+Confidence 89%
 
-AI + Finance project using Groq inference engine.
+--------------------------------------------------
 
----
+Example 2
 
-## ⭐ Contributing
+News:
+Oil supply disruption
 
-Pull requests are welcome!
+Output:
+Bullish Energy
+Bearish Airlines
+
+Signals:
+BUY XOM
+SELL Airline ETF
+
+--------------------------------------------------
+
+# Evaluation Metrics
+
+Classification:
+- Precision
+- Recall
+- F1 Score
+
+Trading:
+- Signal Hit Rate
+- Sharpe Ratio
+- Drawdown
+
+Prediction:
+- 1hr Accuracy
+- 1day Accuracy
+
+--------------------------------------------------
+
+# Future Enhancements
+
+- Multi-agent debate
+- Vector DB memory
+- RAG historical event retrieval
+- Autonomous trading bot
+- Portfolio optimizer
+- Options signal generation
