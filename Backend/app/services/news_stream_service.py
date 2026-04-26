@@ -87,7 +87,7 @@ def get_market_news() -> list:
     Never raises — returns fallback on any error.
     """
     try:
-        url = f"https://finnhub.io/api/v1/news?category=general&token={FINNHUB_KEY}"
+        url = f"https://finnhub.io/api/v1/news?category=forex&token={FINNHUB_KEY}"
         r = requests.get(url, timeout=10)
         r.raise_for_status()
         result = []
